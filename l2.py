@@ -3,25 +3,37 @@ import os
 from contextlib import closing
 from boto3.dynamodb.conditions import Key, Attr
 import logging
+import json
 
 def lambda_handler(event, context):
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
+    print('ndfjkgskjsfdnsfdijg eiruchgiduhqeigur')
     logger.info('monish is chu')
+
     logger.info(event)
     print('event',event)
     postId=event["Records"][0]["Sns"]["MessageId"]
-    postI = event["Records"][0]["Sns"]["Message"]
     logger.info(postId)
+    q=event["Records"][0]["Sns"]["Message"]
+    logger.info(type(q))
+    logger.info('ioioiooioioioioioioioioooio')
+    q1=json.loads(q)
+    logger.info(q1)
+    logger.info('bobobbbobo')
+    temp1 = q1["msg"]
+    logger.info(temp1)
+    postI = temp1
+    u_id = q1['u_id']
 
     # print "Text to Speech function. Post ID in DynamoDB: " + postId
 
-    # #Retrieving information about the post from DynamoDB table
-    # # dynamodb = boto3.resource('dynamodb')
-    # # table = dynamodb.Table(os.environ['DB_TABLE_NAME'])
-    # # postItem = table.query(
-    # #     KeyConditionExpression=Key('id').eq(postId)
-    # # )
+    #Retrieving information about the post from DynamoDB table
+    # dynamodb = boto3.resource('dynamodb')
+    # table = dynamodb.Table(os.environ['DB_TABLE_NAME'])
+    # postItem = table.query(
+    #     KeyConditionExpression=Key('id').eq(postId)
+    # )
 
 
     # text = postItem["Items"][0]["text"]
@@ -86,29 +98,35 @@ def lambda_handler(event, context):
 
     logger.info('tatti karli')
 
-    # location = s3.get_bucket_location(Bucket=os.environ['audio6998'])
-    # region = location['LocationConstraint']
+    location = s3.get_bucket_location(Bucket=os.environ['BUCKET_NAME'])
+    region = location['LocationConstraint']
 
-    # if region is None:
-    #     url_begining = "https://s3.amazonaws.com/"
-    # else:
-    #     url_begining = "https://s3-" + str(region) + ".amazonaws.com/" \
+    if region is None:
+        url_begining = "https://s3.amazonaws.com/"
+    else:
+        url_begining = "https://s3-" + str(region) + ".amazonaws.com/"
+    logger.info('yo mama is fo ')
 
-    # url = url_begining \
-    #         + str(os.environ['audio6998']) \
-    #         + "/" \
-    #         + str(postId) \
-    #         + ".mp3"
+    url = url_begining \
+            + str(os.environ['BUCKET_NAME']) \
+            + "/" \
+            + str(postId) \
+            + ".mp3"
+    logger.info('after yo mama')
+    logger.info(url)
+    #Updating the item in DynamoDB
+    dynamodb = boto3.resource('dynamodb')
+    # table = dynamodb.Table(os.environ['DB_TABLE_NAME'])
+    table = dynamodb.Table('social')
+    logger.info('hvhfrtvtd')
 
-    # #Updating the item in DynamoDB
-    # response = table.update_item(
-    #     Key={'id':postId},
-    #       UpdateExpression=
-    #         "SET #statusAtt = :statusValue, #urlAtt = :urlValue",
-    #       ExpressionAttributeValues=
-    #         {':statusValue': 'UPDATED', ':urlValue': url},
-    #     ExpressionAttributeNames=
-    #       {'#statusAtt': 'status', '#urlAtt': 'url'},
-    # )
+    table.put_item(
+        Item={
+            'u_id' : u_id,
+            'text' : text,
+            'url' : url
+        }
+    )
+    logger.info('sdkjfsdkjfeuybceyfbtwiWDHISFSDUIYFGIUASRBUYAKUCRGSVHFBDSKHJFTA VFASHJKGHFCJAGKSVJ')
 
     return

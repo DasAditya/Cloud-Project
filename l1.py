@@ -27,6 +27,8 @@ def lambda_handler(event, context):
     b=a['data']
     logger.info('b4 monish ')
     logger.info(a)
+    u_id = a['resp']['authResponse']['userID']
+    logger.info(u_id)
     logger.info('after monish')
     logger.info(b)
     texta=' '
@@ -64,10 +66,13 @@ def lambda_handler(event, context):
     # )
 
     #Sending notification about new post to SNS
+    temp = {}
+    temp['msg']=texta
+    temp['u_id']=u_id
     client = boto3.client('sns')
     client.publish(
         TopicArn = 'arn:aws:sns:us-west-2:457946912569:SNS_TOPIC',
-        Message = texta
+        Message = json.dumps(temp)
     )
     logger.info('fucked up gada is here')
 
